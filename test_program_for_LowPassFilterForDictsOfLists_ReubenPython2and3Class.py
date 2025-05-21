@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision E, 09/07/2024
+Software Revision F, 05/21/2025
 
 Verified working on: Python 3.8 for Windows 10 64-bit, Ubuntu 20.04, and Raspberry Pi Buster (no Mac testing yet).
 '''
@@ -275,20 +275,20 @@ if __name__ == '__main__':
     global Counter_MainLoopThread
     Counter_MainLoopThread = 0
 
-    global SINUSOIDAL_MOTION_INPUT_ROMtestTimeToPeakAngle
-    SINUSOIDAL_MOTION_INPUT_ROMtestTimeToPeakAngle = 1.0
+    global SinusoidalMotionInput_ROMtestTimeToPeakAngle
+    SinusoidalMotionInput_ROMtestTimeToPeakAngle = 1.0
 
-    global SINUSOIDAL_MOTION_INPUT_MinValue
-    SINUSOIDAL_MOTION_INPUT_MinValue = -90.0
+    global SinusoidalMotionInput_MinValue
+    SinusoidalMotionInput_MinValue = -90.0
 
-    global SINUSOIDAL_MOTION_INPUT_MaxValue
-    SINUSOIDAL_MOTION_INPUT_MaxValue = 90.0
+    global SinusoidalMotionInput_MaxValue
+    SinusoidalMotionInput_MaxValue = 90.0
 
     global NoiseCounter
     NoiseCounter = 0
 
     global NoiseAmplitude_Percent0to1OfSinuisoidalInputAmplitude
-    NoiseAmplitude_Percent0to1OfSinuisoidalInputAmplitude = 0.1
+    NoiseAmplitude_Percent0to1OfSinuisoidalInputAmplitude = 0.2
 
     global root
 
@@ -324,6 +324,9 @@ if __name__ == '__main__':
 
     global LowPassFilterForDictsOfLists_ExponentialSmoothingFilterLambda
     LowPassFilterForDictsOfLists_ExponentialSmoothingFilterLambda = 0.5 #new_filtered_value = k * raw_sensor_value + (1 - k) * old_filtered_value
+
+    global LowPassFilterForDictsOfLists_UseMedianFilterFlag
+    LowPassFilterForDictsOfLists_UseMedianFilterFlag = 0
 
     global DesiredAngleDeg_1_Raw
     DesiredAngleDeg_1_Raw = 0.0
@@ -391,8 +394,8 @@ if __name__ == '__main__':
     if USE_LowPassFilterForDictsOfLists_FLAG == 1:
         try:
 
-            LowPassFilterForDictsOfLists_DictOfVariableFilterSettings = dict([("DesiredAngleDeg_1", dict([("UseMedianFilterFlag", 1), ("UseExponentialSmoothingFilterFlag", 1),("ExponentialSmoothingFilterLambda", LowPassFilterForDictsOfLists_ExponentialSmoothingFilterLambda)])),
-                                                                              ("DesiredAngleDeg_2", dict([("UseMedianFilterFlag", 0), ("UseExponentialSmoothingFilterFlag", 1),("ExponentialSmoothingFilterLambda", LowPassFilterForDictsOfLists_ExponentialSmoothingFilterLambda)]))])
+            LowPassFilterForDictsOfLists_DictOfVariableFilterSettings = dict([("DesiredAngleDeg_1", dict([("UseMedianFilterFlag", LowPassFilterForDictsOfLists_UseMedianFilterFlag), ("UseExponentialSmoothingFilterFlag", 1),("ExponentialSmoothingFilterLambda", LowPassFilterForDictsOfLists_ExponentialSmoothingFilterLambda)])),
+                                                                              ("DesiredAngleDeg_2", dict([("UseMedianFilterFlag", LowPassFilterForDictsOfLists_UseMedianFilterFlag), ("UseExponentialSmoothingFilterFlag", 1),("ExponentialSmoothingFilterLambda", LowPassFilterForDictsOfLists_ExponentialSmoothingFilterLambda)]))])
 
             LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject = LowPassFilterForDictsOfLists_ReubenPython2and3Class(dict([("DictOfVariableFilterSettings", LowPassFilterForDictsOfLists_DictOfVariableFilterSettings)]))
             LowPassFilterForDictsOfLists_OPEN_FLAG = LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject.OBJECT_CREATED_SUCCESSFULLY_FLAG
@@ -418,6 +421,15 @@ if __name__ == '__main__':
     global EntryListWithBlinking_Variables_ListOfDicts
     EntryListWithBlinking_Variables_ListOfDicts = [dict([("Name", "LowPassFilterForDictsOfLists_ExponentialSmoothingFilterLambda"),
                                                          ("Type", "float"),
+                                                         ("StartingVal", LowPassFilterForDictsOfLists_ExponentialSmoothingFilterLambda),
+                                                         ("MinVal", 0.0),
+                                                         ("MaxVal", 1.0),
+                                                         ("EntryBlinkEnabled", 0),
+                                                         ("EntryWidth", EntryWidth),
+                                                         ("LabelWidth", LabelWidth),
+                                                         ("FontSize", FontSize)]),
+                                                   dict([("Name", "LowPassFilterForDictsOfLists_UseMedianFilterFlag"),
+                                                         ("Type", "int"),
                                                          ("StartingVal", LowPassFilterForDictsOfLists_ExponentialSmoothingFilterLambda),
                                                          ("MinVal", 0.0),
                                                          ("MaxVal", 1.0),
@@ -476,8 +488,8 @@ if __name__ == '__main__':
                                                                                         ("YaxisAutoscaleFlag", 0),
                                                                                         ("X_min", 0.0),
                                                                                         ("X_max", 20.0),
-                                                                                        ("Y_min", 1.1*SINUSOIDAL_MOTION_INPUT_MinValue),
-                                                                                        ("Y_max", 1.1*SINUSOIDAL_MOTION_INPUT_MaxValue),
+                                                                                        ("Y_min", 1.1*SinusoidalMotionInput_MinValue),
+                                                                                        ("Y_max", 1.1*SinusoidalMotionInput_MaxValue),
                                                                                         ("XaxisDrawnAtBottomOfGraph", 0),
                                                                                         ("XaxisLabelString", "Time (sec)"),
                                                                                         ("YaxisLabelString", "Y-units (units)"),
@@ -500,9 +512,6 @@ if __name__ == '__main__':
     ####################################################
     if USE_KEYBOARD_FLAG == 1:
         keyboard.on_press_key("esc", ExitProgram_Callback)
-        #keyboard.on_press_key("space", ExitProgram_Callback)
-        #keyboard.on_press_key("e", ExitProgram_Callback)
-        keyboard.on_press_key("q", ExitProgram_Callback)
     ####################################################
     ####################################################
 
@@ -581,10 +590,15 @@ if __name__ == '__main__':
 
                 if EntryListWithBlinking_MostRecentDict_DataUpdateNumber > 1:
                     LowPassFilterForDictsOfLists_ExponentialSmoothingFilterLambda = EntryListWithBlinking_MostRecentDict["LowPassFilterForDictsOfLists_ExponentialSmoothingFilterLambda"]
+                    LowPassFilterForDictsOfLists_UseMedianFilterFlag = EntryListWithBlinking_MostRecentDict["LowPassFilterForDictsOfLists_UseMedianFilterFlag"]
 
                     if LowPassFilterForDictsOfLists_OPEN_FLAG == 1:
                         LowPassFilterForDictsOfLists_DictOfVariableFilterSettings["DesiredAngleDeg_1"]["ExponentialSmoothingFilterLambda"] = LowPassFilterForDictsOfLists_ExponentialSmoothingFilterLambda
-                        #LowPassFilterForDictsOfLists_DictOfVariableFilterSettings["DesiredAngleDeg_2"]["ExponentialSmoothingFilterLambda"] = LowPassFilterForDictsOfLists_ExponentialSmoothingFilterLambda
+                        LowPassFilterForDictsOfLists_DictOfVariableFilterSettings["DesiredAngleDeg_2"]["ExponentialSmoothingFilterLambda"] = LowPassFilterForDictsOfLists_ExponentialSmoothingFilterLambda
+
+                        LowPassFilterForDictsOfLists_DictOfVariableFilterSettings["DesiredAngleDeg_1"]["UseMedianFilterFlag"] = LowPassFilterForDictsOfLists_UseMedianFilterFlag
+                        LowPassFilterForDictsOfLists_DictOfVariableFilterSettings["DesiredAngleDeg_2"]["UseMedianFilterFlag"] = LowPassFilterForDictsOfLists_UseMedianFilterFlag
+
                         LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject.AddOrUpdateDictOfVariableFilterSettingsFromExternalProgram(LowPassFilterForDictsOfLists_DictOfVariableFilterSettings)
 
         ###################################################
@@ -599,15 +613,15 @@ if __name__ == '__main__':
         #################################################### SET's
         ####################################################
         if LowPassFilterForDictsOfLists_OPEN_FLAG == 1:
-            time_gain = math.pi / (2.0 * SINUSOIDAL_MOTION_INPUT_ROMtestTimeToPeakAngle)
-            DesiredAngleDeg_1_Calculated = 0.5*(SINUSOIDAL_MOTION_INPUT_MaxValue + SINUSOIDAL_MOTION_INPUT_MinValue) + 0.5 * abs(SINUSOIDAL_MOTION_INPUT_MaxValue - SINUSOIDAL_MOTION_INPUT_MinValue) * math.sin(time_gain * CurrentTime_MainLoopThread)  #math.exp(0.1*CurrentTime_MainLoopThread)*0.5 * abs(SINUSOIDAL_MOTION_INPUT_MaxValue - SINUSOIDAL_MOTION_INPUT_MinValue) *
-            DesiredAngleDeg_2_Calculated = 0.5*(SINUSOIDAL_MOTION_INPUT_MaxValue + SINUSOIDAL_MOTION_INPUT_MinValue) + 0.5 * abs(SINUSOIDAL_MOTION_INPUT_MaxValue - SINUSOIDAL_MOTION_INPUT_MinValue) * math.cos(time_gain * CurrentTime_MainLoopThread)
+            time_gain = math.pi / (2.0 * SinusoidalMotionInput_ROMtestTimeToPeakAngle)
+            DesiredAngleDeg_1_Calculated = 0.5*(SinusoidalMotionInput_MaxValue + SinusoidalMotionInput_MinValue) + 0.5 * abs(SinusoidalMotionInput_MaxValue - SinusoidalMotionInput_MinValue) * math.sin(time_gain * CurrentTime_MainLoopThread)  #math.exp(0.1*CurrentTime_MainLoopThread)*0.5 * abs(SinusoidalMotionInput_MaxValue - SinusoidalMotionInput_MinValue) *
+            DesiredAngleDeg_2_Calculated = 0.5*(SinusoidalMotionInput_MaxValue + SinusoidalMotionInput_MinValue) + 0.5 * abs(SinusoidalMotionInput_MaxValue - SinusoidalMotionInput_MinValue) * math.cos(time_gain * CurrentTime_MainLoopThread)
 
             ####################################################
             if USE_SPECKLE_NOISE_FLAG == 1:
                 NoiseCounter = NoiseCounter + 1
                 if NoiseCounter == 1:
-                    NoiseAmplitude = NoiseAmplitude_Percent0to1OfSinuisoidalInputAmplitude*abs(SINUSOIDAL_MOTION_INPUT_MaxValue - SINUSOIDAL_MOTION_INPUT_MinValue)
+                    NoiseAmplitude = NoiseAmplitude_Percent0to1OfSinuisoidalInputAmplitude*abs(SinusoidalMotionInput_MaxValue - SinusoidalMotionInput_MinValue)
                     
                     NoiseValue_1 = random.uniform(-1.0*NoiseAmplitude, NoiseAmplitude)
                     DesiredAngleDeg_1_Calculated = DesiredAngleDeg_1_Calculated + NoiseValue_1
@@ -645,7 +659,10 @@ if __name__ == '__main__':
 
                     MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExternalAddPointOrListOfPointsToPlot(["DesiredAngleDeg_1_Raw", "DesiredAngleDeg_1_Filtered", "DesiredAngleDeg_2_Raw", "DesiredAngleDeg_2_Filtered"],
                                                                                                                             [CurrentTime_MainLoopThread]*4,
-                                                                                                                            [DesiredAngleDeg_1_Raw[0], DesiredAngleDeg_1_Filtered[0], DesiredAngleDeg_2_Raw[0], DesiredAngleDeg_2_Filtered[0]])
+                                                                                                                            [DesiredAngleDeg_1_Raw,
+                                                                                                                             DesiredAngleDeg_1_Filtered,
+                                                                                                                             DesiredAngleDeg_2_Raw,
+                                                                                                                             DesiredAngleDeg_2_Filtered])
 
                 ####################################################
             except:
