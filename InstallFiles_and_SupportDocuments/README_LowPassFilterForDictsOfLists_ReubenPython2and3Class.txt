@@ -14,17 +14,17 @@ www.reubotics.com
 
 Apache 2 License
 
-Software Revision F, 05/21/2025
+Software Revision G, 05/27/2025
 
 Verified working on:
 
-Python 2.7, 3.8.
+Python 3.11/3.12
 
-Windows 8.1, 10 64-bit
+Windows 10/11 64-bit
 
 Ubuntu 20.04
 
-Raspberry Pi Buster
+Raspberry Pi Bookworm
 
 (no Mac testing yet)
 

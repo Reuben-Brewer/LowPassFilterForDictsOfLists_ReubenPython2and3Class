@@ -6,9 +6,9 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision F, 05/21/2025
+Software Revision G, 05/27/2025
 
-Verified working on: Python 3.8 for Windows 10 64-bit, Ubuntu 20.04, and Raspberry Pi Buster (no Mac testing yet).
+Verified working on: Python 3.11/3.12 for Windows 10/11 64-bit, Ubuntu 20.04, and Raspberry Pi Bookworm (no Mac testing yet).
 '''
 
 __author__ = 'reuben.brewer'
@@ -124,6 +124,7 @@ def ExitProgram_Callback(OptionalArugment = 0):
 
 #######################################################################################################################
 #######################################################################################################################
+#######################################################################################################################
 def GUI_Thread():
     global root
     global root_Xpos
@@ -133,19 +134,19 @@ def GUI_Thread():
     global GUI_RootAfterCallbackInterval_Milliseconds
     global USE_TABS_IN_GUI_FLAG
 
-    ################################################# KEY GUI LINE
-    #################################################
+    ####################################################################################################################### KEY GUI LINE
+    #######################################################################################################################
     root = Tk()
-    #################################################
-    #################################################
+    #######################################################################################################################
+    #######################################################################################################################
 
-    #################################################
-    #################################################
+    #######################################################################################################################
+    #######################################################################################################################
     global TabControlObject
     global Tab_MainControls
 
     if USE_TABS_IN_GUI_FLAG == 1:
-        #################################################
+        #######################################################################################################################
         TabControlObject = ttk.Notebook(root)
 
         Tab_MainControls = ttk.Frame(TabControlObject)
@@ -157,27 +158,34 @@ def GUI_Thread():
         TabStyle = ttk.Style()
         TabStyle.configure('TNotebook.Tab', font=('Helvetica', '12', 'bold'))
         #############
-        #################################################
+
+        #######################################################################################################################
     else:
-        #################################################
+        #######################################################################################################################
         Tab_MainControls = root
-        #################################################
+        #######################################################################################################################
 
-    ##########################################################################################################
+    #######################################################################################################################
+    #######################################################################################################################
 
-    ################################################# THIS BLOCK MUST COME 2ND-TO-LAST IN def GUI_Thread() IF USING TABS.
+    ####################################################################################################################### THIS BLOCK MUST COME 2ND-TO-LAST IN def GUI_Thread() IF USING TABS.
+    #######################################################################################################################
     root.protocol("WM_DELETE_WINDOW", ExitProgram_Callback)  # Set the callback function for when the window's closed.
-    root.title("test_program_for_Canon6dofFTsensorFH30020_ReubenPython3Class")
+    root.title("test_program_for_LowPassFilterForDictsOfLists_ReubenPython2and3Class")
     root.geometry('%dx%d+%d+%d' % (root_width, root_height, root_Xpos, root_Ypos)) # set the dimensions of the screen and where it is placed
     root.after(GUI_RootAfterCallbackInterval_Milliseconds, GUI_update_clock)
     root.mainloop()
-    #################################################
+    #######################################################################################################################
+    #######################################################################################################################
 
-    #################################################  THIS BLOCK MUST COME LAST IN def GUI_Thread() REGARDLESS OF CODE.
+    ####################################################################################################################### THIS BLOCK MUST COME LAST IN def GUI_Thread() REGARDLESS OF CODE.
+    #######################################################################################################################
     root.quit() #Stop the GUI thread, MUST BE CALLED FROM GUI_Thread
     root.destroy() #Close down the GUI thread, MUST BE CALLED FROM GUI_Thread
-    #################################################
+    #######################################################################################################################
+    #######################################################################################################################
 
+#######################################################################################################################
 #######################################################################################################################
 #######################################################################################################################
 
@@ -223,8 +231,8 @@ if __name__ == '__main__':
     global USE_EntryListWithBlinking_FLAG
     USE_EntryListWithBlinking_FLAG = 1
 
-    global USE_PLOTTER_FLAG
-    USE_PLOTTER_FLAG = 1
+    global USE_MyPlotterPureTkinterStandAloneProcess_FLAG
+    USE_MyPlotterPureTkinterStandAloneProcess_FLAG = 1
 
     global USE_SPECKLE_NOISE_FLAG
     USE_SPECKLE_NOISE_FLAG = 1
@@ -368,8 +376,17 @@ if __name__ == '__main__':
     ####################################################
     global MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject
 
-    global PLOTTER_OPEN_FLAG
-    PLOTTER_OPEN_FLAG = -1
+    global MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG
+    MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG = -1
+
+    global MyPlotterPureTkinterStandAloneProcess_MostRecentDict
+    MyPlotterPureTkinterStandAloneProcess_MostRecentDict = dict()
+
+    global MyPlotterPureTkinterStandAloneProcess_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag
+    MyPlotterPureTkinterStandAloneProcess_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag = -1
+
+    global LastTime_MainLoopThread_MyPlotterPureTkinterStandAloneProcess
+    LastTime_MainLoopThread_MyPlotterPureTkinterStandAloneProcess = -11111.0
     ####################################################
     ####################################################
 
@@ -391,7 +408,7 @@ if __name__ == '__main__':
 
     ####################################################
     ####################################################
-    if USE_LowPassFilterForDictsOfLists_FLAG == 1:
+    if USE_LowPassFilterForDictsOfLists_FLAG == 1 and EXIT_PROGRAM_FLAG == 0:
         try:
 
             LowPassFilterForDictsOfLists_DictOfVariableFilterSettings = dict([("DesiredAngleDeg_1", dict([("UseMedianFilterFlag", LowPassFilterForDictsOfLists_UseMedianFilterFlag), ("UseExponentialSmoothingFilterFlag", 1),("ExponentialSmoothingFilterLambda", LowPassFilterForDictsOfLists_ExponentialSmoothingFilterLambda)])),
@@ -405,6 +422,16 @@ if __name__ == '__main__':
             print("LowPassFilterForDictsOfLists_ReubenPython2and3Class __init__: Exceptions: %s" % exceptions)
     ####################################################
     ####################################################
+
+    #################################################
+    #################################################
+    if USE_LowPassFilterForDictsOfLists_FLAG == 1:
+        if EXIT_PROGRAM_FLAG == 0:
+            if LowPassFilterForDictsOfLists_OPEN_FLAG != 1:
+                print("Failed to open LowPassFilterForDictsOfLists_ReubenPython2and3Class.")
+                ExitProgram_Callback()
+    #################################################
+    #################################################
 
     ####################################################
     ####################################################
@@ -430,7 +457,7 @@ if __name__ == '__main__':
                                                          ("FontSize", FontSize)]),
                                                    dict([("Name", "LowPassFilterForDictsOfLists_UseMedianFilterFlag"),
                                                          ("Type", "int"),
-                                                         ("StartingVal", LowPassFilterForDictsOfLists_ExponentialSmoothingFilterLambda),
+                                                         ("StartingVal", LowPassFilterForDictsOfLists_UseMedianFilterFlag),
                                                          ("MinVal", 0.0),
                                                          ("MaxVal", 1.0),
                                                          ("EntryBlinkEnabled", 0),
@@ -443,7 +470,8 @@ if __name__ == '__main__':
                                                                           ("EntryListWithBlinking_Variables_ListOfDicts", EntryListWithBlinking_Variables_ListOfDicts),
                                                                           ("DebugByPrintingVariablesFlag", 0),
                                                                           ("LoseFocusIfMouseLeavesEntryFlag", 0)])
-    if USE_EntryListWithBlinking_FLAG == 1:
+
+    if USE_EntryListWithBlinking_FLAG == 1 and EXIT_PROGRAM_FLAG == 0:
         try:
             EntryListWithBlinking_ReubenPython2and3ClassObject = EntryListWithBlinking_ReubenPython2and3Class(EntryListWithBlinking_ReubenPython2and3ClassObject_setup_dict)
             EntryListWithBlinking_OPEN_FLAG = EntryListWithBlinking_ReubenPython2and3ClassObject.OBJECT_CREATED_SUCCESSFULLY_FLAG
@@ -455,19 +483,23 @@ if __name__ == '__main__':
     ####################################################
     ####################################################
 
+    #################################################
+    #################################################
+    if USE_EntryListWithBlinking_FLAG == 1:
+        if EXIT_PROGRAM_FLAG == 0:
+            if EntryListWithBlinking_OPEN_FLAG != 1:
+                print("Failed to open EntryListWithBlinking_ReubenPython2and3Class.")
+                ExitProgram_Callback()
+    #################################################
+    #################################################
+
     ####################################################
     ####################################################
-    global MyPlotterPureTkinter_MostRecentDict
-    MyPlotterPureTkinter_MostRecentDict = dict()
-
-    global MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag
-    MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag = -1
-
-
-
+    global MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_GUIparametersDict
     MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_GUIparametersDict = dict([("EnableInternal_MyPrint_Flag", 1),
                                                                                                 ("NumberOfPrintLines", 10),
-                                                                                                ("GraphCanvasWidth", 1280),
+                                                                                                ("UseBorderAroundThisGuiObjectFlag", 0),
+                                                                                                ("GraphCanvasWidth", 890),
                                                                                                 ("GraphCanvasHeight", 700),
                                                                                                 ("GraphCanvasWindowStartingX", 0),
                                                                                                 ("GraphCanvasWindowStartingY", 0),
@@ -476,9 +508,11 @@ if __name__ == '__main__':
     global MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_setup_dict
     MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_setup_dict = dict([("GUIparametersDict", MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_GUIparametersDict),
                                                                                         ("ParentPID", os.getpid()),
-                                                                                        ("WatchdogTimerExpirationDurationSeconds_StandAlonePlottingProcess", 1.0),
-                                                                                        ("MarkerSize", 3),
-                                                                                        ("CurvesToPlotNamesAndColorsDictOfLists", dict([("NameList", ["DesiredAngleDeg_1_Raw", "DesiredAngleDeg_1_Filtered", "DesiredAngleDeg_2_Raw", "DesiredAngleDeg_2_Filtered"]),("ColorList", ["Red", "Green", "Orange", "Blue"])])),
+                                                                                        ("WatchdogTimerExpirationDurationSeconds_StandAlonePlottingProcess", 5.0),
+                                                                                        ("CurvesToPlotNamesAndColorsDictOfLists", dict([("NameList", ["DesiredAngleDeg_1_Raw", "DesiredAngleDeg_1_Filtered", "DesiredAngleDeg_2_Raw", "DesiredAngleDeg_2_Filtered"]),
+                                                                                                                                        ("MarkerSizeList", [3, 3, 3, 3]),
+                                                                                                                                        ("LineWidthList", [3, 3, 3, 3]),
+                                                                                                                                        ("ColorList", ["Red", "Green", "Orange", "Blue"])])),
                                                                                         ("NumberOfDataPointToPlot", 50),
                                                                                         ("XaxisNumberOfTickMarks", 10),
                                                                                         ("YaxisNumberOfTickMarks", 10),
@@ -495,18 +529,28 @@ if __name__ == '__main__':
                                                                                         ("YaxisLabelString", "Y-units (units)"),
                                                                                         ("ShowLegendFlag", 1)])
 
-    if USE_PLOTTER_FLAG == 1:
+    if USE_MyPlotterPureTkinterStandAloneProcess_FLAG == 1 and EXIT_PROGRAM_FLAG == 0:
         try:
             MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_setup_dict)
             time.sleep(0.25)
-            PLOTTER_OPEN_FLAG = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.OBJECT_CREATED_SUCCESSFULLY_FLAG
+            MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.OBJECT_CREATED_SUCCESSFULLY_FLAG
 
         except:
             exceptions = sys.exc_info()[0]
-            print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject, exceptions: %s" % exceptions)
+            print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class, exceptions: %s" % exceptions)
             traceback.print_exc()
     ####################################################
     ####################################################
+
+    #################################################
+    #################################################
+    if USE_MyPlotterPureTkinterStandAloneProcess_FLAG == 1:
+        if EXIT_PROGRAM_FLAG == 0:
+            if MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG != 1:
+                print("Failed to open MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class.")
+                ExitProgram_Callback()
+    #################################################
+    #################################################
 
     ####################################################
     ####################################################
@@ -515,31 +559,7 @@ if __name__ == '__main__':
     ####################################################
     ####################################################
 
-    ####################################################
-    ####################################################
-    if LowPassFilterForDictsOfLists_OPEN_FLAG != 1:
-        print("Failed to open LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject.")
-        #ExitProgram_Callback()
-    ####################################################
-    ####################################################
-
-    #################################################
-    #################################################
-    if EntryListWithBlinking_OPEN_FLAG != 1:
-        print("Failed to open EntryListWithBlinking_ReubenPython2and3Class.")
-        #ExitProgram_Callback()
-    #################################################
-    #################################################
-
-    #################################################
-    #################################################
-    if USE_PLOTTER_FLAG == 1 and PLOTTER_OPEN_FLAG != 1:
-        print("Failed to open MyPlotterPureTkinterClass_Object.")
-        #ExitProgram_Callback()
-    #################################################
-    #################################################
-
-    ####################################################
+    #################################################### IMPORTANT
     ####################################################
     random.seed()
     ####################################################
@@ -642,33 +662,36 @@ if __name__ == '__main__':
 
         ####################################################
         ####################################################
-        if PLOTTER_OPEN_FLAG == 1:
+        if MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG == 1:
+
+            ####################################################
             try:
-                ####################################################
-                MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_MostRecentDict = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.GetMostRecentDataDict()
 
-                if "StandAlonePlottingProcess_ReadyForWritingFlag" in MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_MostRecentDict:
-                    MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_MostRecentDict["StandAlonePlottingProcess_ReadyForWritingFlag"]
-                else:
-                    pass
-                ####################################################
+                MyPlotterPureTkinterStandAloneProcess_MostRecentDict = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.GetMostRecentDataDict()
 
-                ####################################################
-                if MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag == 1:
-                    dummy = 0
+                if "StandAlonePlottingProcess_ReadyForWritingFlag" in MyPlotterPureTkinterStandAloneProcess_MostRecentDict:
+                    MyPlotterPureTkinterStandAloneProcess_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag = MyPlotterPureTkinterStandAloneProcess_MostRecentDict["StandAlonePlottingProcess_ReadyForWritingFlag"]
 
-                    MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExternalAddPointOrListOfPointsToPlot(["DesiredAngleDeg_1_Raw", "DesiredAngleDeg_1_Filtered", "DesiredAngleDeg_2_Raw", "DesiredAngleDeg_2_Filtered"],
+                    if MyPlotterPureTkinterStandAloneProcess_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag == 1:
+                        if CurrentTime_MainLoopThread - LastTime_MainLoopThread_MyPlotterPureTkinterStandAloneProcess >= 0.040:
+                            MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExternalAddPointOrListOfPointsToPlot(["DesiredAngleDeg_1_Raw", "DesiredAngleDeg_1_Filtered", "DesiredAngleDeg_2_Raw", "DesiredAngleDeg_2_Filtered"],
                                                                                                                             [CurrentTime_MainLoopThread]*4,
                                                                                                                             [DesiredAngleDeg_1_Raw,
                                                                                                                              DesiredAngleDeg_1_Filtered,
                                                                                                                              DesiredAngleDeg_2_Raw,
                                                                                                                              DesiredAngleDeg_2_Filtered])
 
-                ####################################################
+                            LastTime_MainLoopThread_MyPlotterPureTkinterStandAloneProcess = CurrentTime_MainLoopThread
+
+            ####################################################
+
+            ####################################################
             except:
                 exceptions = sys.exc_info()[0]
                 print("test_program_for_LowPassFilterForDictsOfLists_ReubenPython2and3Class: MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExternalAddPointOrListOfPointsToPlot, exceptions: %s" % exceptions, 0)
                 traceback.print_exc()
+            ####################################################
+
         ####################################################
         ####################################################
 
@@ -694,7 +717,7 @@ if __name__ == '__main__':
     #################################################
 
     #################################################
-    if PLOTTER_OPEN_FLAG == 1:
+    if MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG == 1:
         MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExitProgram_Callback()
     #################################################
 
