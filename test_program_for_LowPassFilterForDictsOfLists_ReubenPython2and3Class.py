@@ -6,16 +6,20 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision H, 7/18/2025
+Software Revision I, 12/22/2025
 
-Verified working on: Python 3.11/3.12 for Windows 10/11 64-bit, Ubuntu 20.04, and Raspberry Pi Bookworm (no Mac testing yet).
+Verified working on: Python 3.11/12/13 for Windows 10/11 64-bit, Ubuntu 20.04, and Raspberry Pi Bookworm (no Mac testing yet).
 '''
 
 __author__ = 'reuben.brewer'
 
-##########################################################################################################
-##########################################################################################################
-##########################################################################################################
+#######################################################################################################################
+#######################################################################################################################
+
+###########################################################
+import ReubenGithubCodeModulePaths #Replaces the need to have "ReubenGithubCodeModulePaths.pth" within "C:\Anaconda3\Lib\site-packages".
+ReubenGithubCodeModulePaths.Enable()
+###########################################################
 
 ###########################################################
 from EntryListWithBlinking_ReubenPython2and3Class import *
@@ -31,7 +35,8 @@ import time
 import datetime
 import threading
 import collections
-import math, numpy
+import math
+import numpy
 import traceback
 import re
 import random
@@ -53,9 +58,8 @@ if platform.system() == "Windows":
     winmm.timeBeginPeriod(1) #Set minimum timer resolution to 1ms so that time.sleep(0.001) behaves properly.
 ###########################################################
 
-##########################################################################################################
-##########################################################################################################
-##########################################################################################################
+#######################################################################################################################
+#######################################################################################################################
 
 ##########################################################################################################
 ##########################################################################################################
@@ -166,6 +170,198 @@ def GetLatestWaveformValue(CurrentTime, MinValue, MaxValue, Period, WaveformType
 ##########################################################################################################
 ##########################################################################################################
 
+##########################################################################################################
+##########################################################################################################
+##########################################################################################################
+##########################################################################################################
+def ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(input, number_of_leading_numbers = 4, number_of_decimal_places = 3):
+
+    number_of_decimal_places = max(1, number_of_decimal_places) #Make sure we're above 1
+
+    ListOfStringsToJoin = []
+
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    if isinstance(input, str) == 1:
+        ListOfStringsToJoin.append(input)
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    elif isinstance(input, int) == 1 or isinstance(input, float) == 1:
+        element = float(input)
+        prefix_string = "{:." + str(number_of_decimal_places) + "f}"
+        element_as_string = prefix_string.format(element)
+
+        ##########################################################################################################
+        ##########################################################################################################
+        if element >= 0:
+            element_as_string = element_as_string.zfill(number_of_leading_numbers + number_of_decimal_places + 1 + 1)  # +1 for sign, +1 for decimal place
+            element_as_string = "+" + element_as_string  # So that our strings always have either + or - signs to maintain the same string length
+        else:
+            element_as_string = element_as_string.zfill(number_of_leading_numbers + number_of_decimal_places + 1 + 1 + 1)  # +1 for sign, +1 for decimal place
+        ##########################################################################################################
+        ##########################################################################################################
+
+        ListOfStringsToJoin.append(element_as_string)
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    elif isinstance(input, list) == 1:
+
+        if len(input) > 0:
+            for element in input: #RECURSION
+                ListOfStringsToJoin.append(ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(element, number_of_leading_numbers, number_of_decimal_places))
+
+        else: #Situation when we get a list() or []
+            ListOfStringsToJoin.append(str(input))
+
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    elif isinstance(input, tuple) == 1:
+
+        if len(input) > 0:
+            for element in input: #RECURSION
+                ListOfStringsToJoin.append("TUPLE" + ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(element, number_of_leading_numbers, number_of_decimal_places))
+
+        else: #Situation when we get a list() or []
+            ListOfStringsToJoin.append(str(input))
+
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    elif isinstance(input, dict) == 1:
+
+        if len(input) > 0:
+            for Key in input: #RECURSION
+                ListOfStringsToJoin.append(str(Key) + ": " + ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(input[Key], number_of_leading_numbers, number_of_decimal_places))
+
+        else: #Situation when we get a dict()
+            ListOfStringsToJoin.append(str(input))
+
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    else:
+        ListOfStringsToJoin.append(str(input))
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    if len(ListOfStringsToJoin) > 1:
+
+        ##########################################################################################################
+        ##########################################################################################################
+
+        ##########################################################################################################
+        StringToReturn = ""
+        for Index, StringToProcess in enumerate(ListOfStringsToJoin):
+
+            ################################################
+            if Index == 0: #The first element
+                if StringToProcess.find(":") != -1 and StringToProcess[0] != "{": #meaning that we're processing a dict()
+                    StringToReturn = "{"
+                elif StringToProcess.find("TUPLE") != -1 and StringToProcess[0] != "(":  # meaning that we're processing a tuple
+                    StringToReturn = "("
+                else:
+                    StringToReturn = "["
+
+                StringToReturn = StringToReturn + StringToProcess.replace("TUPLE","") + ", "
+            ################################################
+
+            ################################################
+            elif Index < len(ListOfStringsToJoin) - 1: #The middle elements
+                StringToReturn = StringToReturn + StringToProcess + ", "
+            ################################################
+
+            ################################################
+            else: #The last element
+                StringToReturn = StringToReturn + StringToProcess
+
+                if StringToProcess.find(":") != -1 and StringToProcess[-1] != "}":  # meaning that we're processing a dict()
+                    StringToReturn = StringToReturn + "}"
+                elif StringToProcess.find("TUPLE") != -1 and StringToProcess[-1] != ")":  # meaning that we're processing a tuple
+                    StringToReturn = StringToReturn + ")"
+                else:
+                    StringToReturn = StringToReturn + "]"
+
+            ################################################
+
+        ##########################################################################################################
+
+        ##########################################################################################################
+        ##########################################################################################################
+
+    elif len(ListOfStringsToJoin) == 1:
+        StringToReturn = ListOfStringsToJoin[0]
+
+    else:
+        StringToReturn = ListOfStringsToJoin
+
+    return StringToReturn
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+
+##########################################################################################################
+##########################################################################################################
+##########################################################################################################
+##########################################################################################################
+
+##########################################################################################################
+##########################################################################################################
+def ConvertDictToProperlyFormattedStringForPrinting(DictToPrint, NumberOfDecimalsPlaceToUse = 3, NumberOfEntriesPerLine = 1, NumberOfTabsBetweenItems = 3):
+
+    ProperlyFormattedStringForPrinting = ""
+    ItemsPerLineCounter = 0
+
+    for Key in DictToPrint:
+
+        if isinstance(DictToPrint[Key], dict): #RECURSION
+            ProperlyFormattedStringForPrinting = ProperlyFormattedStringForPrinting + \
+                                                 str(Key) + ":\n" + \
+                                                 ConvertDictToProperlyFormattedStringForPrinting(DictToPrint[Key], NumberOfDecimalsPlaceToUse, NumberOfEntriesPerLine, NumberOfTabsBetweenItems)
+
+        else:
+            ProperlyFormattedStringForPrinting = ProperlyFormattedStringForPrinting + \
+                                                 str(Key) + ": " + \
+                                                 ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(DictToPrint[Key], 0, NumberOfDecimalsPlaceToUse)
+
+        if ItemsPerLineCounter < NumberOfEntriesPerLine - 1:
+            ProperlyFormattedStringForPrinting = ProperlyFormattedStringForPrinting + "\t"*NumberOfTabsBetweenItems
+            ItemsPerLineCounter = ItemsPerLineCounter + 1
+        else:
+            ProperlyFormattedStringForPrinting = ProperlyFormattedStringForPrinting + "\n"
+            ItemsPerLineCounter = 0
+
+    return ProperlyFormattedStringForPrinting
+##########################################################################################################
+##########################################################################################################
+
 #######################################################################################################################
 #######################################################################################################################
 def getPreciseSecondsTimeStampString():
@@ -208,17 +404,18 @@ def GUI_update_clock():
     global GUI_RootAfterCallbackInterval_Milliseconds
     global USE_GUI_FLAG
 
-    global EntryListWithBlinking_ReubenPython2and3ClassObject
+    global EntryListWithBlinking_Object
     global EntryListWithBlinking_OPEN_FLAG
 
     if USE_GUI_FLAG == 1:
+        
         if EXIT_PROGRAM_FLAG == 0:
         #########################################################
         #########################################################
 
             #########################################################
             if EntryListWithBlinking_OPEN_FLAG == 1:
-                EntryListWithBlinking_ReubenPython2and3ClassObject.GUI_update_clock()
+                EntryListWithBlinking_Object.GUI_update_clock()
             #########################################################
 
             root.after(GUI_RootAfterCallbackInterval_Milliseconds, GUI_update_clock)
@@ -251,9 +448,16 @@ def GUI_Thread():
     global GUI_RootAfterCallbackInterval_Milliseconds
     global USE_TABS_IN_GUI_FLAG
 
+    global EntryListWithBlinking_Object
+    global EntryListWithBlinking_OPEN_FLAG
+
     ####################################################################################################################### KEY GUI LINE
     #######################################################################################################################
     root = Tk()
+    
+    root.protocol("WM_DELETE_WINDOW", ExitProgram_Callback)  # Set the callback function for when the window's closed.
+    root.title("test_program_for_LowPassFilterForDictsOfLists_ReubenPython2and3Class")
+    root.geometry('%dx%d+%d+%d' % (root_width, root_height, root_Xpos, root_Ypos)) # set the dimensions of the screen and where it is placed
     #######################################################################################################################
     #######################################################################################################################
 
@@ -285,11 +489,15 @@ def GUI_Thread():
     #######################################################################################################################
     #######################################################################################################################
 
+    #######################################################################################################################
+    #######################################################################################################################
+    if EntryListWithBlinking_OPEN_FLAG == 1:
+        EntryListWithBlinking_Object.CreateGUIobjects(TkinterParent=Tab_MainControls)
+    #######################################################################################################################
+    #######################################################################################################################
+
     ####################################################################################################################### THIS BLOCK MUST COME 2ND-TO-LAST IN def GUI_Thread() IF USING TABS.
     #######################################################################################################################
-    root.protocol("WM_DELETE_WINDOW", ExitProgram_Callback)  # Set the callback function for when the window's closed.
-    root.title("test_program_for_LowPassFilterForDictsOfLists_ReubenPython2and3Class")
-    root.geometry('%dx%d+%d+%d' % (root_width, root_height, root_Xpos, root_Ypos)) # set the dimensions of the screen and where it is placed
     root.after(GUI_RootAfterCallbackInterval_Milliseconds, GUI_update_clock)
     root.mainloop()
     #######################################################################################################################
@@ -410,7 +618,7 @@ if __name__ == '__main__':
     Counter_CalculatedFromMainThread = 0
 
     global PeriodicInput_AcceptableValues
-    PeriodicInput_AcceptableValues = ["GUI", "VINThub", "Sine", "Cosine", "Triangular", "Square"]
+    PeriodicInput_AcceptableValues = ["GUI", "Sine", "Cosine", "Triangular", "Square"]
 
     global PeriodicInput_Type_1
     PeriodicInput_Type_1 = "Sine"
@@ -475,19 +683,19 @@ if __name__ == '__main__':
 
     ####################################################
     ####################################################
-    global LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject
+    global LowPassFilterForDictsOfLists_Object
 
     global LowPassFilterForDictsOfLists_OPEN_FLAG
     LowPassFilterForDictsOfLists_OPEN_FLAG = -1
 
-    global LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject_MostRecentDict
-    LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject_MostRecentDict = dict()
+    global LowPassFilterForDictsOfLists_MostRecentDict
+    LowPassFilterForDictsOfLists_MostRecentDict = dict()
 
     global LowPassFilterForDictsOfLists_ExponentialSmoothingFilterLambda  #unicorn
     LowPassFilterForDictsOfLists_ExponentialSmoothingFilterLambda = 0.7 #new_filtered_value = k * raw_sensor_value + (1 - k) * old_filtered_value
 
     global LowPassFilterForDictsOfLists_UseMedianFilterFlag
-    LowPassFilterForDictsOfLists_UseMedianFilterFlag = 1
+    LowPassFilterForDictsOfLists_UseMedianFilterFlag = 0
 
     global LowPassFilterForDictsOfLists_UseExponentialSmoothingFilterFlag
     LowPassFilterForDictsOfLists_UseExponentialSmoothingFilterFlag = 1
@@ -499,7 +707,7 @@ if __name__ == '__main__':
 
     #################################################
     #################################################
-    global EntryListWithBlinking_ReubenPython2and3ClassObject
+    global EntryListWithBlinking_Object
 
     global EntryListWithBlinking_OPEN_FLAG
     EntryListWithBlinking_OPEN_FLAG = -1
@@ -521,7 +729,7 @@ if __name__ == '__main__':
 
     ####################################################
     ####################################################
-    global MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject
+    global MyPlotterPureTkinterStandAloneProcess_Object
 
     global MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG
     MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG = -1
@@ -529,32 +737,14 @@ if __name__ == '__main__':
     global MyPlotterPureTkinterStandAloneProcess_MostRecentDict
     MyPlotterPureTkinterStandAloneProcess_MostRecentDict = dict()
 
-    global MyPlotterPureTkinterStandAloneProcess_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag
-    MyPlotterPureTkinterStandAloneProcess_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag = -1
+    global MyPlotterPureTkinterStandAloneProcess_MostRecentDict_ReadyForWritingFlag
+    MyPlotterPureTkinterStandAloneProcess_MostRecentDict_ReadyForWritingFlag = -1
 
     global LastTime_CalculatedFromMainThread_MyPlotterPureTkinterStandAloneProcess
     LastTime_CalculatedFromMainThread_MyPlotterPureTkinterStandAloneProcess = -11111.0
     ####################################################
     ####################################################
 
-    ##########################################################################################################
-    ##########################################################################################################
-    ##########################################################################################################
-
-    ##########################################################################################################  KEY GUI LINE
-    ##########################################################################################################
-    ##########################################################################################################
-    if USE_GUI_FLAG == 1:
-        print("Starting GUI thread...")
-        GUI_Thread_ThreadingObject = threading.Thread(target=GUI_Thread)
-        GUI_Thread_ThreadingObject.setDaemon(True) #Should mean that the GUI thread is destroyed automatically when the main thread is destroyed.
-        GUI_Thread_ThreadingObject.start()
-        time.sleep(0.5)  #Allow enough time for 'root' to be created that we can then pass it into other classes.
-    else:
-        root = None
-        Tab_MainControls = None
-        Tab_Canon6dofFTsensorFH30020 = None
-        Tab_MyPrint = None
     ##########################################################################################################
     ##########################################################################################################
     ##########################################################################################################
@@ -571,8 +761,8 @@ if __name__ == '__main__':
             LowPassFilterForDictsOfLists_DictOfVariableFilterSettings = dict([("PeriodicInput_CalculatedValue_1", dict([("UseMedianFilterFlag", LowPassFilterForDictsOfLists_UseMedianFilterFlag), ("UseExponentialSmoothingFilterFlag", LowPassFilterForDictsOfLists_UseExponentialSmoothingFilterFlag),("ExponentialSmoothingFilterLambda", LowPassFilterForDictsOfLists_ExponentialSmoothingFilterLambda)])),
                                                                               ("PeriodicInput_CalculatedValue_2", dict([("UseMedianFilterFlag", LowPassFilterForDictsOfLists_UseMedianFilterFlag), ("UseExponentialSmoothingFilterFlag", LowPassFilterForDictsOfLists_UseExponentialSmoothingFilterFlag),("ExponentialSmoothingFilterLambda", LowPassFilterForDictsOfLists_ExponentialSmoothingFilterLambda)]))])
 
-            LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject = LowPassFilterForDictsOfLists_ReubenPython2and3Class(dict([("DictOfVariableFilterSettings", LowPassFilterForDictsOfLists_DictOfVariableFilterSettings)]))
-            LowPassFilterForDictsOfLists_OPEN_FLAG = LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject.OBJECT_CREATED_SUCCESSFULLY_FLAG
+            LowPassFilterForDictsOfLists_Object = LowPassFilterForDictsOfLists_ReubenPython2and3Class(dict([("DictOfVariableFilterSettings", LowPassFilterForDictsOfLists_DictOfVariableFilterSettings)]))
+            LowPassFilterForDictsOfLists_OPEN_FLAG = LowPassFilterForDictsOfLists_Object.OBJECT_CREATED_SUCCESSFULLY_FLAG
 
         except:
             exceptions = sys.exc_info()[0]
@@ -600,15 +790,14 @@ if __name__ == '__main__':
 
     #################################################
     #################################################
-    global EntryListWithBlinking_ReubenPython2and3ClassObject_GUIparametersDict
-    EntryListWithBlinking_ReubenPython2and3ClassObject_GUIparametersDict = dict([("root", Tab_MainControls),
-                                    ("UseBorderAroundThisGuiObjectFlag", 0),
-                                    ("GUI_ROW", GUI_ROW_EntryListWithBlinking),
-                                    ("GUI_COLUMN", GUI_COLUMN_EntryListWithBlinking),
-                                    ("GUI_PADX", GUI_PADX_EntryListWithBlinking),
-                                    ("GUI_PADY", GUI_PADY_EntryListWithBlinking),
-                                    ("GUI_ROWSPAN", GUI_ROWSPAN_EntryListWithBlinking),
-                                    ("GUI_COLUMNSPAN", GUI_COLUMNSPAN_EntryListWithBlinking)])
+    global EntryListWithBlinking_GUIparametersDict
+    EntryListWithBlinking_GUIparametersDict = dict([("UseBorderAroundThisGuiObjectFlag", 0),
+                                                    ("GUI_ROW", GUI_ROW_EntryListWithBlinking),
+                                                    ("GUI_COLUMN", GUI_COLUMN_EntryListWithBlinking),
+                                                    ("GUI_PADX", GUI_PADX_EntryListWithBlinking),
+                                                    ("GUI_PADY", GUI_PADY_EntryListWithBlinking),
+                                                    ("GUI_ROWSPAN", GUI_ROWSPAN_EntryListWithBlinking),
+                                                    ("GUI_COLUMNSPAN", GUI_COLUMNSPAN_EntryListWithBlinking)])
 
     global EntryListWithBlinking_Variables_ListOfDicts
     EntryListWithBlinking_Variables_ListOfDicts = [dict([("Name", "LowPassFilterForDictsOfLists_ExponentialSmoothingFilterLambda"),
@@ -630,20 +819,20 @@ if __name__ == '__main__':
                                                          ("LabelWidth", LabelWidth),
                                                          ("FontSize", FontSize)])]
 
-    global EntryListWithBlinking_ReubenPython2and3ClassObject_setup_dict
-    EntryListWithBlinking_ReubenPython2and3ClassObject_setup_dict = dict([("GUIparametersDict", EntryListWithBlinking_ReubenPython2and3ClassObject_GUIparametersDict),
-                                                                          ("EntryListWithBlinking_Variables_ListOfDicts", EntryListWithBlinking_Variables_ListOfDicts),
-                                                                          ("DebugByPrintingVariablesFlag", 0),
-                                                                          ("LoseFocusIfMouseLeavesEntryFlag", 0)])
+    global EntryListWithBlinking_SetupDict
+    EntryListWithBlinking_SetupDict = dict([("GUIparametersDict", EntryListWithBlinking_GUIparametersDict),
+                                              ("EntryListWithBlinking_Variables_ListOfDicts", EntryListWithBlinking_Variables_ListOfDicts),
+                                              ("DebugByPrintingVariablesFlag", 0),
+                                              ("LoseFocusIfMouseLeavesEntryFlag", 0)])
 
     if USE_EntryListWithBlinking_FLAG == 1 and EXIT_PROGRAM_FLAG == 0:
         try:
-            EntryListWithBlinking_ReubenPython2and3ClassObject = EntryListWithBlinking_ReubenPython2and3Class(EntryListWithBlinking_ReubenPython2and3ClassObject_setup_dict)
-            EntryListWithBlinking_OPEN_FLAG = EntryListWithBlinking_ReubenPython2and3ClassObject.OBJECT_CREATED_SUCCESSFULLY_FLAG
+            EntryListWithBlinking_Object = EntryListWithBlinking_ReubenPython2and3Class(EntryListWithBlinking_SetupDict)
+            EntryListWithBlinking_OPEN_FLAG = EntryListWithBlinking_Object.OBJECT_CREATED_SUCCESSFULLY_FLAG
 
         except:
             exceptions = sys.exc_info()[0]
-            print("EntryListWithBlinking_ReubenPython2and3ClassObject __init__: Exceptions: %s" % exceptions, 0)
+            print("EntryListWithBlinking_Object __init__: Exceptions: %s" % exceptions, 0)
             traceback.print_exc()
     #################################################
     #################################################
@@ -670,46 +859,45 @@ if __name__ == '__main__':
     #################################################
     global MyPlotterPureTkinterStandAloneProcess_GUIparametersDict
     MyPlotterPureTkinterStandAloneProcess_GUIparametersDict = dict([("EnableInternal_MyPrint_Flag", 1),
-                                                                                                ("NumberOfPrintLines", 10),
-                                                                                                ("UseBorderAroundThisGuiObjectFlag", 0),
-                                                                                                ("GraphCanvasWidth", 890),
-                                                                                                ("GraphCanvasHeight", 700),
-                                                                                                ("GraphCanvasWindowStartingX", 0),
-                                                                                                ("GraphCanvasWindowStartingY", 0),
-                                                                                                ("GUI_RootAfterCallbackInterval_Milliseconds_IndependentOfParentRootGUIloopEvents", 20)])
+                                                                    ("NumberOfPrintLines", 10),
+                                                                    ("UseBorderAroundThisGuiObjectFlag", 0),
+                                                                    ("GraphCanvasWidth", 890),
+                                                                    ("GraphCanvasHeight", 700),
+                                                                    ("GraphCanvasWindowStartingX", 0),
+                                                                    ("GraphCanvasWindowStartingY", 0),
+                                                                    ("GUI_RootAfterCallbackInterval_Milliseconds_IndependentOfParentRootGUIloopEvents", 30)])
 
     global MyPlotterPureTkinterStandAloneProcess_SetupDict
     MyPlotterPureTkinterStandAloneProcess_SetupDict = dict([("GUIparametersDict", MyPlotterPureTkinterStandAloneProcess_GUIparametersDict),
-                                                                                        ("ParentPID", os.getpid()),
-                                                                                        ("WatchdogTimerExpirationDurationSeconds_StandAlonePlottingProcess", 5.0),
-                                                                                        ("CurvesToPlotNamesAndColorsDictOfLists", dict([("NameList", ["PeriodicInput_CalculatedValue_1_Raw", "PeriodicInput_CalculatedValue_1_Filtered", "PeriodicInput_CalculatedValue_2_Raw", "PeriodicInput_CalculatedValue_2_Filtered"]),
-                                                                                                                                        ("MarkerSizeList", [3, 3, 3, 3]),
-                                                                                                                                        ("LineWidthList", [3, 3, 3, 3]),
-                                                                                                                                        ("ColorList", ["Red", "Green", "Orange", "Blue"])])),
-                                                                                        ("SmallTextSize", 7),
-                                                                                        ("LargeTextSize", 12),
-                                                                                        ("NumberOfDataPointToPlot", 50),
-                                                                                        ("XaxisNumberOfTickMarks", 10),
-                                                                                        ("YaxisNumberOfTickMarks", 10),
-                                                                                        ("XaxisNumberOfDecimalPlacesForLabels", 3),
-                                                                                        ("YaxisNumberOfDecimalPlacesForLabels", 3),
-                                                                                        ("XaxisAutoscaleFlag", 1),
-                                                                                        ("YaxisAutoscaleFlag", 1),
-                                                                                        ("X_min", 0.0),
-                                                                                        ("X_max", 20.0),
-                                                                                        ("Y_min", 1.1*min(PeriodicInput_MinValue_1, PeriodicInput_MinValue_2)),
-                                                                                        ("Y_max", 1.1*max(PeriodicInput_MinValue_1, PeriodicInput_MinValue_2)),
-                                                                                        ("XaxisDrawnAtBottomOfGraph", 0),
-                                                                                        ("XaxisLabelString", "Time (sec)"),
-                                                                                        ("YaxisLabelString", "Y-units (units)"),
-                                                                                        ("ShowLegendFlag", 1),
-                                                                                        ("SavePlot_DirectoryPath", os.path.join(os.getcwd(), "SavedImagesFolder"))])
+                                                            ("ParentPID", os.getpid()),
+                                                            ("WatchdogTimerExpirationDurationSeconds_StandAlonePlottingProcess", 5.0),
+                                                            ("CurvesToPlotNamesAndColorsDictOfLists", dict([("NameList", ["PeriodicInput_CalculatedValue_1_Raw", "PeriodicInput_CalculatedValue_1_Filtered", "PeriodicInput_CalculatedValue_2_Raw", "PeriodicInput_CalculatedValue_2_Filtered"]),
+                                                                                                            ("MarkerSizeList", [3, 3, 3, 3]),
+                                                                                                            ("LineWidthList", [3, 3, 3, 3]),
+                                                                                                            ("ColorList", ["Red", "Green", "Orange", "Blue"])])),
+                                                            ("SmallTextSize", 7),
+                                                            ("LargeTextSize", 12),
+                                                            ("NumberOfDataPointToPlot", 50),
+                                                            ("XaxisNumberOfTickMarks", 10),
+                                                            ("YaxisNumberOfTickMarks", 10),
+                                                            ("XaxisNumberOfDecimalPlacesForLabels", 3),
+                                                            ("YaxisNumberOfDecimalPlacesForLabels", 3),
+                                                            ("XaxisAutoscaleFlag", 1),
+                                                            ("YaxisAutoscaleFlag", 1),
+                                                            ("X_min", 0.0),
+                                                            ("X_max", 20.0),
+                                                            ("Y_min", 1.1*min(PeriodicInput_MinValue_1, PeriodicInput_MinValue_2)),
+                                                            ("Y_max", 1.1*max(PeriodicInput_MinValue_1, PeriodicInput_MinValue_2)),
+                                                            ("XaxisDrawnAtBottomOfGraph", 0),
+                                                            ("XaxisLabelString", "Time (sec)"),
+                                                            ("YaxisLabelString", "Y-units (units)"),
+                                                            ("ShowLegendFlag", 1),
+                                                            ("SavePlot_DirectoryPath", os.path.join(os.getcwd(), "SavedImagesFolder"))])
 
     if USE_MyPlotterPureTkinterStandAloneProcess_FLAG == 1 and EXIT_PROGRAM_FLAG == 0:
         try:
-            MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(MyPlotterPureTkinterStandAloneProcess_SetupDict)
-            time.sleep(0.25)
-            MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.OBJECT_CREATED_SUCCESSFULLY_FLAG
+            MyPlotterPureTkinterStandAloneProcess_Object = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(MyPlotterPureTkinterStandAloneProcess_SetupDict)
+            MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG = MyPlotterPureTkinterStandAloneProcess_Object.OBJECT_CREATED_SUCCESSFULLY_FLAG
 
         except:
             exceptions = sys.exc_info()[0]
@@ -735,20 +923,23 @@ if __name__ == '__main__':
     ##########################################################################################################
     ##########################################################################################################
     ##########################################################################################################
-
-    #################################################
-    #################################################
-    if USE_KEYBOARD_FLAG == 1:
+    if USE_KEYBOARD_FLAG == 1 and EXIT_PROGRAM_FLAG == 0:
         keyboard.on_press_key("esc", ExitProgram_Callback)
-    #################################################
-    #################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
 
-    ################################################# IMPORTANT
-    #################################################
-    random.seed()
-    #################################################
-    #################################################
-
+    ##########################################################################################################  KEY GUI LINE
+    ##########################################################################################################
+    ##########################################################################################################
+    if USE_GUI_FLAG == 1 and EXIT_PROGRAM_FLAG == 0:
+        print("Starting GUI thread...")
+        GUI_Thread_ThreadingObject = threading.Thread(target=GUI_Thread, daemon=True) #Daemon=True means that the GUI thread is destroyed automatically when the main thread is destroyed
+        GUI_Thread_ThreadingObject.start()
+    else:
+        root = None
+        Tab_MainControls = None
+        Tab_MyPrint = None
     ##########################################################################################################
     ##########################################################################################################
     ##########################################################################################################
@@ -766,21 +957,22 @@ if __name__ == '__main__':
     ##########################################################################################################
     ##########################################################################################################
     ##########################################################################################################
+    random.seed() #IMPORTANT
     while(EXIT_PROGRAM_FLAG == 0):
 
-        ##########################################################################################################
-        ##########################################################################################################
+        #################################################
+        #################################################
         CurrentTime_CalculatedFromMainThread = getPreciseSecondsTimeStampString() - StartingTime_CalculatedFromMainThread
-        ##########################################################################################################
-        ##########################################################################################################
+        #################################################
+        #################################################
 
-        ##########################################################################################################
-        ##########################################################################################################
+        ################################################# GET's
+        #################################################
 
-        ################################################## GET's
+        ##################################################
         if EntryListWithBlinking_OPEN_FLAG == 1:
 
-            EntryListWithBlinking_MostRecentDict = EntryListWithBlinking_ReubenPython2and3ClassObject.GetMostRecentDataDict()
+            EntryListWithBlinking_MostRecentDict = EntryListWithBlinking_Object.GetMostRecentDataDict()
 
             if "DataUpdateNumber" in EntryListWithBlinking_MostRecentDict and EntryListWithBlinking_MostRecentDict["DataUpdateNumber"] != EntryListWithBlinking_MostRecentDict_DataUpdateNumber_last:
                 EntryListWithBlinking_MostRecentDict_DataUpdateNumber = EntryListWithBlinking_MostRecentDict["DataUpdateNumber"]
@@ -797,7 +989,7 @@ if __name__ == '__main__':
                         LowPassFilterForDictsOfLists_DictOfVariableFilterSettings["PeriodicInput_CalculatedValue_1"]["UseMedianFilterFlag"] = LowPassFilterForDictsOfLists_UseMedianFilterFlag
                         LowPassFilterForDictsOfLists_DictOfVariableFilterSettings["PeriodicInput_CalculatedValue_2"]["UseMedianFilterFlag"] = LowPassFilterForDictsOfLists_UseMedianFilterFlag
 
-                        LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject.AddOrUpdateDictOfVariableFilterSettingsFromExternalProgram(LowPassFilterForDictsOfLists_DictOfVariableFilterSettings)
+                        LowPassFilterForDictsOfLists_Object.AddOrUpdateDictOfVariableFilterSettingsFromExternalProgram(LowPassFilterForDictsOfLists_DictOfVariableFilterSettings)
 
         #################################################
 
@@ -805,13 +997,12 @@ if __name__ == '__main__':
         EntryListWithBlinking_MostRecentDict_DataUpdateNumber_last = EntryListWithBlinking_MostRecentDict_DataUpdateNumber
         #################################################
 
-        ##########################################################################################################
-        ##########################################################################################################
-
-        ##########################################################################################################
-        ##########################################################################################################
-        
         #################################################
+        #################################################
+
+        #################################################
+        #################################################
+
         #################################################
         PeriodicInput_CalculatedValue_1 = GetLatestWaveformValue(CurrentTime_CalculatedFromMainThread, 
                                                                 PeriodicInput_MinValue_1, 
@@ -819,15 +1010,11 @@ if __name__ == '__main__':
                                                                 PeriodicInput_Period_1, 
                                                                 PeriodicInput_Type_1)
         #################################################
-        #################################################
 
-        #################################################
         #################################################
         PeriodicInput_CalculatedValue_2 = PeriodicInput_CalculatedValue_1*2.0 + 3.0
         #################################################
-        #################################################
 
-        #################################################
         #################################################
         if USE_SPECKLE_NOISE_FLAG == 1:
             
@@ -838,45 +1025,54 @@ if __name__ == '__main__':
                 PeriodicInput_CalculatedValue_2 = PeriodicInput_CalculatedValue_2 + NoiseValue
                 NoiseCounter = 0
         #################################################
-        #################################################
         
-        ##########################################################################################################
-        ##########################################################################################################
+        #################################################
+        #################################################
 
-        ##########################################################################################################
-        ##########################################################################################################
-
-        ################################################# SET's
+        ################################################# GET's and SET's
         #################################################
         if LowPassFilterForDictsOfLists_OPEN_FLAG == 1:
 
+            '''
+            #AddDataDictFromExternalProgram returns the same as GetMostRecentDataDict: return deepcopy(self.VariablesDict.copy()), SO THERE'S NO NEED TO CALL LowPassFilterForDictsOfLists_MostRecentDict SEPARATELY.
+            #LowPassFilterForDictsOfLists_MostRecentDict = LowPassFilterForDictsOfLists_Object.GetMostRecentDataDict() 
+            #print("LowPassFilterForDictsOfLists_MostRecentDict: " + str(LowPassFilterForDictsOfLists_MostRecentDict))
+            '''
 
-            ################################################# SET'S
-            LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject.AddDataDictFromExternalProgram(dict([("PeriodicInput_CalculatedValue_1", [PeriodicInput_CalculatedValue_1]),
-                                                                                                           ("PeriodicInput_CalculatedValue_2", [PeriodicInput_CalculatedValue_2])]),
-                                                                                                     PrintInfoForDebuggingFlag=LowPassFilterForDictsOfLists_AddDataDictFromExternalProgram__PrintInfoForDebuggingFlag)
-            #################################################
+            LowPassFilterForDictsOfLists_MostRecentDict = LowPassFilterForDictsOfLists_Object.AddDataDictFromExternalProgram(dict([("PeriodicInput_CalculatedValue_1", [PeriodicInput_CalculatedValue_1]),
+                                                                                                                                   ("PeriodicInput_CalculatedValue_2", [PeriodicInput_CalculatedValue_2])]),
+                                                                                                                                   PrintInfoForDebuggingFlag=LowPassFilterForDictsOfLists_AddDataDictFromExternalProgram__PrintInfoForDebuggingFlag)
 
-            ################################################# GET's
-            if LowPassFilterForDictsOfLists_OPEN_FLAG == 1:
+            if "PeriodicInput_CalculatedValue_1" in LowPassFilterForDictsOfLists_MostRecentDict:
+                PeriodicInput_CalculatedValue_1_Raw = LowPassFilterForDictsOfLists_MostRecentDict["PeriodicInput_CalculatedValue_1"]["Raw_MostRecentValuesList"] #USUALLY WHAT YOU WANT.
+                PeriodicInput_CalculatedValue_1_Filtered = LowPassFilterForDictsOfLists_MostRecentDict["PeriodicInput_CalculatedValue_1"]["Filtered_MostRecentValuesList"] #USUALLY WHAT YOU WANT.
 
-                LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject_MostRecentDict = LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject.GetMostRecentDataDict()
-                # print("LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject_MostRecentDict: " + str(LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject_MostRecentDict))
+                PeriodicInput_CalculatedValue_1__SignalInRawHistoryList = LowPassFilterForDictsOfLists_MostRecentDict["PeriodicInput_CalculatedValue_1"]["__SignalInRawHistoryList"] #YOU USUALLY DON'T WANT TO LOOK AT THIS HISTORY LIST; LOOKING HERE JUST FOR DEBUGGING
+                PeriodicInput_CalculatedValue_1__SignalOutFilteredHistoryList = LowPassFilterForDictsOfLists_MostRecentDict["PeriodicInput_CalculatedValue_1"]["__SignalOutFilteredHistoryList"] #YOU USUALLY DON'T WANT TO LOOK AT THIS HISTORY LIST; LOOKING HERE JUST FOR DEBUGGING
 
-                if "PeriodicInput_CalculatedValue_1" in LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject_MostRecentDict:
-                    PeriodicInput_CalculatedValue_1_Raw = LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject_MostRecentDict["PeriodicInput_CalculatedValue_1"]["Raw_MostRecentValuesList"]
-                    PeriodicInput_CalculatedValue_1_Filtered = LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject_MostRecentDict["PeriodicInput_CalculatedValue_1"]["Filtered_MostRecentValuesList"]
+                PeriodicInput_CalculatedValue_2_Raw = LowPassFilterForDictsOfLists_MostRecentDict["PeriodicInput_CalculatedValue_2"]["Raw_MostRecentValuesList"] #USUALLY WHAT YOU WANT.
+                PeriodicInput_CalculatedValue_2_Filtered = LowPassFilterForDictsOfLists_MostRecentDict["PeriodicInput_CalculatedValue_2"]["Filtered_MostRecentValuesList"] #USUALLY WHAT YOU WANT.
 
-                    PeriodicInput_CalculatedValue_2_Raw = LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject_MostRecentDict["PeriodicInput_CalculatedValue_2"]["Raw_MostRecentValuesList"]
-                    PeriodicInput_CalculatedValue_2_Filtered = LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject_MostRecentDict["PeriodicInput_CalculatedValue_2"]["Filtered_MostRecentValuesList"]
+                PeriodicInput_CalculatedValue_2__SignalInRawHistoryList = LowPassFilterForDictsOfLists_MostRecentDict["PeriodicInput_CalculatedValue_2"]["__SignalInRawHistoryList"] #YOU USUALLY DON'T WANT TO LOOK AT THIS HISTORY LIST; LOOKING HERE JUST FOR DEBUGGING
+                PeriodicInput_CalculatedValue_2__SignalOutFilteredHistoryList = LowPassFilterForDictsOfLists_MostRecentDict["PeriodicInput_CalculatedValue_2"]["__SignalOutFilteredHistoryList"] #YOU USUALLY DON'T WANT TO LOOK AT THIS HISTORY LIST; LOOKING HERE JUST FOR DEBUGGING
 
-                    if LowPassFilterForDictsOfLists_AddDataDictFromExternalProgram__PrintInfoForDebuggingFlag == 1:
-                        print("PeriodicInput_CalculatedValue_1_Raw: " + str(PeriodicInput_CalculatedValue_1_Raw) + \
-                              ", PeriodicInput_CalculatedValue_1_Filtered: " + str(PeriodicInput_CalculatedValue_1_Filtered) + \
-                              ", PeriodicInput_CalculatedValue_2_Raw: " + str(PeriodicInput_CalculatedValue_2_Raw) + \
-                              ", PeriodicInput_CalculatedValue_2_Filtered: " + str(PeriodicInput_CalculatedValue_2_Filtered))
+                if LowPassFilterForDictsOfLists_AddDataDictFromExternalProgram__PrintInfoForDebuggingFlag == 1:
+                    print("***"
+                          "\nPeriodicInput_CalculatedValue_1_Raw: " + ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(PeriodicInput_CalculatedValue_1_Raw, 0, 3) + \
+                          "\nPeriodicInput_CalculatedValue_1_Fil: " + ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(PeriodicInput_CalculatedValue_1_Filtered, 0, 3) + \
 
-            #################################################
+                          "\nHistory_1_Raw: " + ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(PeriodicInput_CalculatedValue_1__SignalInRawHistoryList, 0, 3) + \
+                          "\nHistory_1_Fil: " + ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(PeriodicInput_CalculatedValue_1__SignalOutFilteredHistoryList, 0, 3) + \
+
+                          "\nPeriodicInput_CalculatedValue_2_Raw: " + ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(PeriodicInput_CalculatedValue_2_Raw, 0, 3) + \
+                          "\nPeriodicInput_CalculatedValue_2_Fil: " + ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(PeriodicInput_CalculatedValue_2_Filtered, 0, 3) + \
+
+                          "\nHistory_2_Raw: " + ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(PeriodicInput_CalculatedValue_2__SignalInRawHistoryList, 0, 3) + \
+                          "\nHistory_2_Fil: " + ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(PeriodicInput_CalculatedValue_2__SignalOutFilteredHistoryList, 0, 3) + \
+
+                          "\n***")
+
+        #################################################
 
         #################################################
         #################################################
@@ -888,22 +1084,22 @@ if __name__ == '__main__':
             #################################################
             try:
 
-                MyPlotterPureTkinterStandAloneProcess_MostRecentDict = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.GetMostRecentDataDict()
+                MyPlotterPureTkinterStandAloneProcess_MostRecentDict = MyPlotterPureTkinterStandAloneProcess_Object.GetMostRecentDataDict()
 
                 if "StandAlonePlottingProcess_ReadyForWritingFlag" in MyPlotterPureTkinterStandAloneProcess_MostRecentDict:
-                    MyPlotterPureTkinterStandAloneProcess_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag = MyPlotterPureTkinterStandAloneProcess_MostRecentDict["StandAlonePlottingProcess_ReadyForWritingFlag"]
+                    MyPlotterPureTkinterStandAloneProcess_MostRecentDict_ReadyForWritingFlag = MyPlotterPureTkinterStandAloneProcess_MostRecentDict["StandAlonePlottingProcess_ReadyForWritingFlag"]
 
-                    if MyPlotterPureTkinterStandAloneProcess_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag == 1:
-                        if CurrentTime_CalculatedFromMainThread - LastTime_CalculatedFromMainThread_MyPlotterPureTkinterStandAloneProcess >= 0.040:
-                            MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExternalAddPointOrListOfPointsToPlot(["PeriodicInput_CalculatedValue_1_Raw",
-                                                                                                                                     "PeriodicInput_CalculatedValue_1_Filtered",
-                                                                                                                                     "PeriodicInput_CalculatedValue_2_Raw",
-                                                                                                                                     "PeriodicInput_CalculatedValue_2_Filtered"],
-                                                                                                                                    [CurrentTime_CalculatedFromMainThread]*4,
-                                                                                                                                    [PeriodicInput_CalculatedValue_1_Raw,
-                                                                                                                                     PeriodicInput_CalculatedValue_1_Filtered,
-                                                                                                                                     PeriodicInput_CalculatedValue_2_Raw,
-                                                                                                                                     PeriodicInput_CalculatedValue_2_Filtered])
+                    if MyPlotterPureTkinterStandAloneProcess_MostRecentDict_ReadyForWritingFlag == 1:
+                        if CurrentTime_CalculatedFromMainThread - LastTime_CalculatedFromMainThread_MyPlotterPureTkinterStandAloneProcess >= MyPlotterPureTkinterStandAloneProcess_GUIparametersDict["GUI_RootAfterCallbackInterval_Milliseconds_IndependentOfParentRootGUIloopEvents"]/1000.0 + 0.001:
+                            MyPlotterPureTkinterStandAloneProcess_Object.ExternalAddPointOrListOfPointsToPlot(["PeriodicInput_CalculatedValue_1_Raw",
+                                                                                                             "PeriodicInput_CalculatedValue_1_Filtered",
+                                                                                                             "PeriodicInput_CalculatedValue_2_Raw",
+                                                                                                             "PeriodicInput_CalculatedValue_2_Filtered"],
+                                                                                                            [CurrentTime_CalculatedFromMainThread]*4,
+                                                                                                            [PeriodicInput_CalculatedValue_1_Raw,
+                                                                                                             PeriodicInput_CalculatedValue_1_Filtered,
+                                                                                                             PeriodicInput_CalculatedValue_2_Raw,
+                                                                                                             PeriodicInput_CalculatedValue_2_Filtered])
 
                             LastTime_CalculatedFromMainThread_MyPlotterPureTkinterStandAloneProcess = CurrentTime_CalculatedFromMainThread
 
@@ -912,7 +1108,7 @@ if __name__ == '__main__':
             #################################################
             except:
                 exceptions = sys.exc_info()[0]
-                print("test_program_for_LowPassFilterForDictsOfLists_ReubenPython2and3Class: MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExternalAddPointOrListOfPointsToPlot, exceptions: %s" % exceptions, 0)
+                print("test_program_for_LowPassFilterForDictsOfLists_ReubenPython2and3Class: MyPlotterPureTkinterStandAloneProcess_Object.ExternalAddPointOrListOfPointsToPlot, exceptions: %s" % exceptions, 0)
                 traceback.print_exc()
             #################################################
 
@@ -929,7 +1125,7 @@ if __name__ == '__main__':
 
         UpdateFrequencyCalculation()
 
-        time.sleep(0.040)
+        time.sleep(0.030)
         ##########################################################################################################
         ##########################################################################################################
 
@@ -951,14 +1147,14 @@ if __name__ == '__main__':
     #################################################
     #################################################
     if EntryListWithBlinking_OPEN_FLAG == 1:
-        EntryListWithBlinking_ReubenPython2and3ClassObject.ExitProgram_Callback()
+        EntryListWithBlinking_Object.ExitProgram_Callback()
     #################################################
     #################################################
 
     #################################################
     #################################################
     if MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG == 1:
-        MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExitProgram_Callback()
+        MyPlotterPureTkinterStandAloneProcess_Object.ExitProgram_Callback()
     #################################################
     #################################################
 

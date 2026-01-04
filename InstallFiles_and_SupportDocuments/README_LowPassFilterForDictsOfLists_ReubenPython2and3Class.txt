@@ -14,11 +14,11 @@ www.reubotics.com
 
 Apache 2 License
 
-Software Revision H, 7/18/2025
+Software Revision I, 12/22/2025
 
 Verified working on:
 
-Python 3.11/3.12
+Python 3.11/12/13
 
 Windows 10/11 64-bit
 
@@ -32,13 +32,12 @@ Raspberry Pi Bookworm
 
 ########################### Python module installation instructions, all OS's
 
-LowPassFilterForDictsOfLists_ReubenPython2and3Class, ListOfModuleDependencies: ['numpy']
+LowPassFilterForDictsOfLists_ReubenPython2and3Class, ListOfModuleDependencies: ['numpy', 'ReubenGithubCodeModulePaths']
 
-LowPassFilterForDictsOfLists_ReubenPython2and3Class, ListOfModuleDependencies_TestProgram: ['EntryListWithBlinking_ReubenPython2and3Class', 'keyboard', 'MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class']
+LowPassFilterForDictsOfLists_ReubenPython2and3Class, ListOfModuleDependencies_TestProgram: ['EntryListWithBlinking_ReubenPython2and3Class', 'keyboard', 'MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class', 'numpy', 'ReubenGithubCodeModulePaths']
 
-LowPassFilterForDictsOfLists_ReubenPython2and3Class, ListOfModuleDependencies_NestedLayers: ['future.builtins', 'numpy', 'pexpect', 'psutil']
+LowPassFilterForDictsOfLists_ReubenPython2and3Class, ListOfModuleDependencies_NestedLayers: ['GetCPUandMemoryUsageOfProcessByPID_ReubenPython3Class', 'numpy', 'pexpect', 'psutil', 'pyautogui', 'ReubenGithubCodeModulePaths']
 
-LowPassFilterForDictsOfLists_ReubenPython2and3Class, ListOfModuleDependencies_All:['EntryListWithBlinking_ReubenPython2and3Class', 'future.builtins', 'keyboard', 'MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class', 'numpy', 'pexpect', 'psutil']
-
+LowPassFilterForDictsOfLists_ReubenPython2and3Class, ListOfModuleDependencies_All:['EntryListWithBlinking_ReubenPython2and3Class', 'GetCPUandMemoryUsageOfProcessByPID_ReubenPython3Class', 'keyboard', 'MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class', 'numpy', 'pexpect', 'psutil', 'pyautogui', 'ReubenGithubCodeModulePaths']
 
 ###########################
